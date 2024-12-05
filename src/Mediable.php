@@ -382,7 +382,7 @@ trait Mediable
 
         $this->rehydrateMediaIfNecessary($tags);
 
-        return $this->media
+        return $this->media()->get()
             //exclude media not matching at least one tag
             ->filter(function (Media $media) use ($tags) {
                 return in_array($media->pivot->tag, (array)$tags);
@@ -401,14 +401,14 @@ trait Mediable
         $this->rehydrateMediaIfNecessary($tags);
 
         //group all tags for each media
-        $modelTags = $this->media->reduce(function ($carry, Media $media) {
+        $modelTags = $this->media()->reduce(function ($carry, Media $media) {
             $carry[$media->getKey()][] = $media->pivot->tag;
 
             return $carry;
         }, []);
 
         //exclude media not matching all tags
-        return $this->media->filter(function (Media $media) use ($tags, $modelTags) {
+        return $this->media()->filter(function (Media $media) use ($tags, $modelTags) {
             return count(array_intersect($tags, $modelTags[$media->getKey()])) === count($tags);
         })->keyBy(function (Media $media) {
             return $media->getKey();
@@ -447,7 +447,7 @@ trait Mediable
     {
         $this->rehydrateMediaIfNecessary();
 
-        return $this->media->groupBy('pivot.tag');
+        return $this->media()->groupBy('pivot.tag');
     }
 
     /**
@@ -459,7 +459,7 @@ trait Mediable
     {
         $this->rehydrateMediaIfNecessary();
 
-        return $this->media->reduce(function ($carry, Media $item) use ($media) {
+        return $this->media()->reduce(function ($carry, Media $item) use ($media) {
             if ($item->getKey() === $media->getKey()) {
                 $carry[] = $item->pivot->tag;
             }
